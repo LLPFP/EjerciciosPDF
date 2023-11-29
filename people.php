@@ -61,6 +61,11 @@ if ($action == 'edit') {
                     <input type="submit" name="submit" value="<?php echo ucfirst($action); ?>" />
                 </td>
             </tr>
+
+            <tr>
+                <td>Email</td>
+                <td><input type="text" name="people_email" value="<?php echo $people_email; ?>"/></td>
+            </tr>
         </table>
     </form>
 </body>
