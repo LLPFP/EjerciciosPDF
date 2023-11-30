@@ -22,13 +22,25 @@ if ($action == 'edit') {
     $people_isactor = 0;
     $people_isdirector = 0;
 }
+
 ?>
 
 <html>
 <head>
     <title><?php echo ucfirst($action); ?> Person</title>
+    <style type="text/css">
+        #error { background-color: black; border: 1px solid black; color: white;
+         text-align: center; margin: 10px; padding: 10px; }
+        
+    </style>
 </head>
 <body>
+<?php
+if (isset($_GET['error']) && $_GET['error'] != '') {
+    echo '<div id="error">' . $_GET['error'] . '</div>';
+}
+?>
+
     <form action="commit.php?action=<?php echo $action; ?>&type=people" method="post">
         <table>
             <tr>
@@ -62,10 +74,6 @@ if ($action == 'edit') {
                 </td>
             </tr>
 
-            <tr>
-                <td>Email</td>
-                <td><input type="text" name="people_email" value="<?php echo $people_email; ?>"/></td>
-            </tr>
         </table>
     </form>
 </body>

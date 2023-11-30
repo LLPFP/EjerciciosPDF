@@ -9,16 +9,46 @@ switch ($_GET['action']) {
     case 'add':
         switch ($_GET['type']) {
             case 'people':
-                $errors = validatePeopleData($_POST);
-                
-                if (empty($errors)) {
+                $error = array();
+		
+                $people_fullname = isset($_POST['people_fullname']) ?
+                    trim($_POST['people_fullname']) : '';
+		
+                if (empty($people_fullname)) {
+                    $error[] = urlencode('Please enter a full name.');
+                        }
+                if (strlen($people_fullname)>50){
+                    $error[] = urlencode('Please do not use more than 50 chars');
+                }
+
+                $people_isactor = isset($_POST['people_isactor']) ? 1:0;
+                    
+                if (!is_numeric($people_isactor) || !in_array($people_isactor, [0, 1])) {
+                    $error[] = urlencode('Invalid value for Is Actor. Please use 0 or 1.');
+                }
+                $people_isdirector = isset($_POST['people_isdirector']) ? 1:0;
+                    
+                if (!is_numeric($people_isdirector) || !in_array($people_isdirector, [0, 1])) {
+                    $error[] = urlencode('Invalid value for Is Director. Please use 0 or 1.');
+                }
+
+                if (empty($error)) {
                     $query = 'INSERT INTO
                         people
                             (people_fullname, people_isactor, people_isdirector)
                         VALUES
-                            ("' . $_POST['people_fullname'] . '",
-                             ' . $_POST['people_isactor'] . ',
-                             ' . $_POST['people_isdirector'] . ')';
+                            ("' . $people_fullname . '",
+                             ' . $people_isactor . ',
+                             ' . $people_isdirector . ')';
+                             echo $query;
+                } else {
+                    if (!is_array($error)) {
+                        $error = [$error];
+                    }
+
+                    $errorString = join('<br/>', array_map('urlencode', $error));
+                    header('Location:people.php?action=add' . '&error=' . $errorString);
+                    exit();
                 }
                 break;
         }
@@ -26,16 +56,42 @@ switch ($_GET['action']) {
 
     case 'edit':
         switch ($_GET['type']) {
-            case 'movie':
-               
-                $query = 'UPDATE movie SET
-                        movie_name = "' . $_POST['movie_name'] . '",
-                        movie_year = ' . $_POST['movie_year'] . ',
-                        movie_type = ' . $_POST['movie_type'] . ',
-                        movie_leadactor = ' . $_POST['movie_leadactor'] . ',
-                        movie_director = ' . $_POST['movie_director'] . '
-                    WHERE
-                        movie_id = ' . $_POST['movie_id'];
+            case 'people':
+                $error = array();
+                $people_fullname = isset($_POST['people_fullname']) ?
+                    trim($_POST['people_fullname']) : '';
+                if (empty($people_fullname)) {
+                    $error[] = urlencode('Please enter a full name.');
+                }
+                $people_isactor = isset($_POST['people_isactor']) ? 1:0;
+             
+                if (!is_numeric($people_isactor) || !in_array($people_isactor, [0, 1])) {
+                    $error[] = urlencode('Invalid value for Is Actor. Please use 0 or 1.');
+                }
+                $people_isdirector = isset($_POST['people_isdirector']) ? 1:0;
+                    
+                if (!is_numeric($people_isdirector) || !in_array($people_isdirector, [0, 1])) {
+                    $error[] = urlencode('Invalid value for Is Director. Please use 0 or 1.');
+                }
+
+                if (empty($error)) {
+                    $query = 'UPDATE
+                            people
+                        SET 
+                            people_fullname = "' . $people_fullname . '",
+                            people_isactor = ' . $people_isactor . ',
+                            people_isdirector = ' . $people_isdirector . '
+                        WHERE
+                            people_id = ' . $_POST['people_id'];
+                } else {
+                    if (!is_array($error)) {
+                        $error = [$error];
+                    }
+
+                    $errorString = join('<br/>', array_map('urlencode', $error));
+                    header('Location: people.php?action=add' . '&error=' . $errorString);
+                    exit();
+                }
                 break;
         }
         break;
@@ -55,25 +111,6 @@ if (isset($query)) {
 }
 
 echo '<p>Done!</p>';
-
-function validatePeopleData($data) {
-    $error = [];
-
-    $people_fullname = isset($data['people_fullname']) ? trim($data['people_fullname']) : '';
-    if (empty($people_fullname)) {
-        $error[] = 'Please enter a full name.';
-    }
-
-    $people_email = isset($data['people_email']) ? trim($data['people_email']) : '';
-    if (!filter_var($people_email, FILTER_VALIDATE_EMAIL)) {
-        $error[] = 'Please enter a valid email address.';
-    }
-
-    $people_isactor = isset($data['people_isactor']) ? $data['people_isactor'] : 0;
-    // Add validations for other fields as needed
-
-    return $error;
-}
 
 
 ?>
